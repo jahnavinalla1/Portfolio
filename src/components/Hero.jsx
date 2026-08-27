@@ -128,7 +128,7 @@ const Hero = () => {
       </div>
 
       {/* Content */}
-      <div className="glass-card" style={{ position: 'relative', zIndex: 10, textAlign: 'center', padding: '4rem 2rem', maxWidth: '1000px', backgroundColor: 'rgba(255,255,255,0.7)', backdropFilter: 'blur(12px)', border: '1px solid rgba(255,255,255,0.5)', margin: '0 20px' }}>
+      <div className="glass-card" style={{ position: 'relative', zIndex: 10, textAlign: 'center', padding: '4rem 2rem', maxWidth: '1000px', backgroundColor: 'rgba(10,14,20,0.75)', backdropFilter: 'blur(16px)', border: '1px solid var(--border)', margin: '0 20px' }}>
         <h1 className="gradient-text" style={{ fontSize: '5.5rem', fontWeight: 800, marginBottom: '1.5rem', lineHeight: 1.1 }}>
           {profile.name}
         </h1>
@@ -138,18 +138,41 @@ const Hero = () => {
         <p style={{ fontSize: '1.4rem', lineHeight: 1.6, color: 'var(--muted)', marginBottom: '3.5rem' }}>
           {profile.summary}
         </p>
-        <a href="#experience" className="gradient-button" style={{
-          display: 'inline-flex',
-          alignItems: 'center',
-          padding: '1.25rem 2.5rem',
-          borderRadius: '9999px',
-          fontWeight: 700,
-          fontSize: '1.2rem',
-          transition: 'all 0.3s ease'
-        }}>
-          Explore My Work
-          <span style={{ marginLeft: '10px' }}>→</span>
-        </a>
+        <div style={{ display: 'flex', gap: '1.25rem', justifyContent: 'center', flexWrap: 'wrap' }}>
+          <a href="#experience" className="gradient-button" style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            padding: '1.25rem 2.5rem',
+            borderRadius: '9999px',
+            fontWeight: 700,
+            fontSize: '1.2rem',
+            transition: 'all 0.3s ease'
+          }}>
+            Explore My Work
+            <span style={{ marginLeft: '10px' }}>→</span>
+          </a>
+          <button
+            onClick={() => window.dispatchEvent(new CustomEvent('open-chat'))}
+            className="pulse-cta"
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              padding: '1.25rem 2.5rem',
+              borderRadius: '9999px',
+              fontWeight: 700,
+              fontSize: '1.2rem',
+              border: 'none',
+              cursor: 'pointer',
+              color: '#fff',
+              background: 'linear-gradient(135deg, var(--primary), var(--accent))',
+              transition: 'transform 0.3s ease'
+            }}
+            onMouseEnter={(e) => (e.currentTarget.style.transform = 'scale(1.03)')}
+            onMouseLeave={(e) => (e.currentTarget.style.transform = 'scale(1)')}
+          >
+            💬 Ask Me Anything
+          </button>
+        </div>
       </div>
     </section>
   );

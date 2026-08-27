@@ -53,11 +53,14 @@ const Experience = () => {
           }} />
 
           {experience.map((item, idx) => (
-            <div 
-              key={idx} 
+            <div
+              key={idx}
               style={{
                 position: 'relative',
-                marginBottom: idx === experience.length - 1 ? '0' : '4rem'
+                marginBottom: idx === experience.length - 1 ? '0' : '4rem',
+                opacity: isVisible ? 1 : 0,
+                transform: isVisible ? 'translateX(0)' : 'translateX(-30px)',
+                transition: `opacity 0.6s ease ${idx * 0.15}s, transform 0.6s ease ${idx * 0.15}s`,
               }}
             >
               {/* Horizontal line connector */}
@@ -105,7 +108,7 @@ const Experience = () => {
                 </ul>
 
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', marginTop: '2rem', paddingTop: '1.5rem', borderTop: '1px solid var(--border)' }}>
-                  {(item.role.includes('Intern') ? ['React', 'TypeScript', 'AWS', 'Python'] : ['React 19', 'Node.js', 'AWS Lambda', 'OpenAI SDK', 'MySQL']).map(skill => {
+                  {(item.tech || []).map(skill => {
                     const color = getSkillColor(skill);
                     return (
                       <span key={skill} className="pill" style={{ backgroundColor: `${color}22`, color: color }}>
