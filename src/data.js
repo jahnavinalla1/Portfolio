@@ -99,7 +99,7 @@ export const education = [
 
 export const projects = [
   {
-    name: "PRISMA — Demand Forecasting & Supply-Chain Intelligence",
+    name: "SCMA — Demand Forecasting & Supply-Chain Intelligence",
     role: "Personal Project",
     date: "August 2025 - December 2025",
     status: "Completed",

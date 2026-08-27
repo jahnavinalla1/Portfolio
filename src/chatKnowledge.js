@@ -154,7 +154,7 @@ const formatProject = (p, { full } = {}) =>
 // Keywords distinctive enough to identify a single project, so a question about
 // one specific project gets that project's full detail instead of all five at once.
 const PROJECT_KEYWORDS = {
-  'PRISMA — Demand Forecasting & Supply-Chain Intelligence': ['prisma'],
+  'SCMA — Demand Forecasting & Supply-Chain Intelligence': ['scma'],
   'CHIRP — Full-Stack Social Media Platform': ['chirp'],
   'Medicare AI Chatbot': ['medicare'],
   'IT Asset Management System — IniTech Solutions': ['asset management', 'initech'],
@@ -183,7 +183,7 @@ const certificationsAnswer = (query = '') => {
 };
 
 const fitAnswer = () =>
-  `${profile.summary} She's grounded through hands-on production work at Arrant Technologies — real-time sensor ingestion pipelines on AWS, contract-first API design, and OpenAI integration — plus personal projects spanning AI-driven demand forecasting (PRISMA) and a full-stack gRPC/REST platform (CHIRP). If a role needs full-stack ownership from React through AWS infra, that's squarely her lane.`;
+  `${profile.summary} She's grounded through hands-on production work at Arrant Technologies — real-time sensor ingestion pipelines on AWS, contract-first API design, and OpenAI integration — plus personal projects spanning AI-driven demand forecasting (SCMA) and a full-stack gRPC/REST platform (CHIRP). If a role needs full-stack ownership from React through AWS infra, that's squarely her lane.`;
 
 const summaryAnswer = () =>
   `${profile.name} is a ${profile.role}${recruiterFacts.location ? ` based in ${recruiterFacts.location}` : ''}. ${profile.summary}`;
@@ -252,7 +252,7 @@ const TOPICS = [
   },
   {
     id: 'projects',
-    keywords: ['project', 'projects', 'prisma', 'chirp', 'medicare', 'asset management', 'incident management', 'initech', 'cybersecurity', 'capstone', 'startup'],
+    keywords: ['project', 'projects', 'scma', 'chirp', 'medicare', 'asset management', 'incident management', 'initech', 'cybersecurity', 'capstone', 'startup'],
     answer: projectsAnswer,
   },
   {

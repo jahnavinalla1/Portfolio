@@ -3,7 +3,7 @@ import { useRef, useState, useEffect } from 'react';
 import { getSkillColor } from '../utils';
 
 const PROJECT_IMAGES = [
-  { match: 'PRISMA', url: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=600&q=80' },
+  { match: 'SCMA', url: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=600&q=80' },
   { match: 'CHIRP', url: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=600&q=80' },
   { match: 'Medicare', url: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=600&q=80' },
   { match: 'Asset Management', url: 'https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=600&q=80' },
