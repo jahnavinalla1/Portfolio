@@ -1,134 +1,61 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { profile } from '../data';
 
-const linkedinHandle = profile.linkedin.replace(/^https?:\/\/(www\.)?/, '').replace(/\/$/, '');
+const SECTIONS = [
+  { href: '#approach', label: 'Approach' },
+  { href: '#work', label: 'Work' },
+  { href: '#builds', label: 'Builds' },
+  { href: '#stack', label: 'Stack' },
+  { href: '#about', label: 'About' },
+  { href: '#contact', label: 'Contact' },
+];
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
-  const [isContactOpen, setIsContactOpen] = useState(false);
-  const contactRef = useRef(null);
+  const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20);
-    };
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    const onScroll = () => setIsScrolled(window.scrollY > 12);
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
+  // The mobile sheet overlays the page, so close it once a link is taken.
   useEffect(() => {
-    const handleClickOutside = (e) => {
-      if (contactRef.current && !contactRef.current.contains(e.target)) {
-        setIsContactOpen(false);
-      }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
+    if (!isOpen) return;
+    const close = () => setIsOpen(false);
+    window.addEventListener('resize', close);
+    return () => window.removeEventListener('resize', close);
+  }, [isOpen]);
 
   return (
-    <nav style={{
-      position: 'fixed',
-      top: 0,
-      width: '100%',
-      padding: '1.5rem 4%',
-      display: 'flex',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-      zIndex: 50,
-      transition: 'all 0.3s ease',
-      backgroundColor: isScrolled ? 'var(--nav-bg)' : 'transparent',
-      backdropFilter: isScrolled ? 'blur(12px)' : 'none',
-      borderBottom: isScrolled ? '1px solid var(--border)' : '1px solid transparent'
-    }}>
-      <div>
-        <a href="/" style={{
-          fontSize: '1.75rem',
-          fontWeight: '800',
-          color: 'var(--primary)',
-          paddingBottom: '0.25rem',
-          borderBottom: '3px solid var(--primary)',
-          letterSpacing: '-0.02em'
-        }}>
-          {profile.name}
-        </a>
-      </div>
-      <div className="nav-links" style={{ display: 'flex', gap: '2.5rem', alignItems: 'center' }}>
-        <a href="#experience" className="nav-link" style={{ fontSize: '1.1rem', fontWeight: 600, color: 'var(--foreground)' }}>Experience</a>
-        <a href="#projects" className="nav-link" style={{ fontSize: '1.1rem', fontWeight: 600, color: 'var(--foreground)' }}>Projects</a>
-        <a href="#about" className="nav-link" style={{ fontSize: '1.1rem', fontWeight: 600, color: 'var(--foreground)' }}>About</a>
-        <a href="/resume.pdf" download="Jahnavi_Nalla_Resume.pdf" className="nav-link" style={{ fontSize: '1.1rem', fontWeight: 600, color: 'var(--foreground)' }}>Resume</a>
-        <a href={profile.github} target="_blank" rel="noreferrer" className="nav-link" style={{ fontSize: '1.1rem', fontWeight: 600, color: 'var(--foreground)' }}>GitHub</a>
+    <nav className={`nav${isScrolled || isOpen ? ' nav--scrolled' : ''}`}>
+      <div className="wrap nav__inner">
+        <a href="#top" className="nav__brand">{profile.name}</a>
 
-        <div ref={contactRef} style={{ position: 'relative' }}>
-          <button
-            onClick={() => setIsContactOpen((v) => !v)}
-            className="nav-link"
-            style={{
-              fontSize: '1.1rem',
-              fontWeight: 600,
-              color: 'var(--foreground)',
-              background: 'none',
-              border: 'none',
-              cursor: 'pointer',
-              padding: 0,
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '0.35rem',
-              fontFamily: 'inherit',
-            }}
-          >
-            Contact
-            <span style={{ fontSize: '0.7rem', transform: isContactOpen ? 'rotate(180deg)' : 'rotate(0)', transition: 'transform 0.2s ease' }}>▾</span>
-          </button>
-
-          {isContactOpen && (
-            <div
-              className="glass-card"
-              style={{
-                position: 'absolute',
-                top: 'calc(100% + 1rem)',
-                right: 0,
-                width: '280px',
-                padding: '0.75rem',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '0.25rem',
-                zIndex: 60,
-              }}
-            >
-              <a
-                href={profile.linkedin}
-                target="_blank"
-                rel="noreferrer"
-                onClick={() => setIsContactOpen(false)}
-                style={{ display: 'flex', flexDirection: 'column', padding: '0.65rem 0.75rem', borderRadius: '0.6rem', color: 'var(--foreground)' }}
-                className="contact-option"
-              >
-                <span style={{ fontSize: '0.75rem', color: 'var(--muted)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.03em' }}>LinkedIn</span>
-                <span style={{ fontSize: '0.95rem', fontWeight: 600 }}>{linkedinHandle}</span>
-              </a>
-              <a
-                href={`tel:${profile.phone.replace(/[^\d+]/g, '')}`}
-                onClick={() => setIsContactOpen(false)}
-                style={{ display: 'flex', flexDirection: 'column', padding: '0.65rem 0.75rem', borderRadius: '0.6rem', color: 'var(--foreground)' }}
-                className="contact-option"
-              >
-                <span style={{ fontSize: '0.75rem', color: 'var(--muted)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.03em' }}>Phone</span>
-                <span style={{ fontSize: '0.95rem', fontWeight: 600 }}>{profile.phone}</span>
-              </a>
-              <a
-                href={`mailto:${profile.email}`}
-                onClick={() => setIsContactOpen(false)}
-                style={{ display: 'flex', flexDirection: 'column', padding: '0.65rem 0.75rem', borderRadius: '0.6rem', color: 'var(--foreground)' }}
-                className="contact-option"
-              >
-                <span style={{ fontSize: '0.75rem', color: 'var(--muted)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.03em' }}>Email</span>
-                <span style={{ fontSize: '0.95rem', fontWeight: 600 }}>{profile.email}</span>
-              </a>
-            </div>
-          )}
+        <div className={`nav__links${isOpen ? ' nav__links--open' : ''}`}>
+          {SECTIONS.map((s) => (
+            <a key={s.href} href={s.href} className="nav__link" onClick={() => setIsOpen(false)}>
+              {s.label}
+            </a>
+          ))}
         </div>
+
+        <div className="nav__ext">
+          <a href="/resume.pdf" download="Jahnavi_Nalla_Resume.pdf" className="nav__extlink">Résumé ↓</a>
+          <a href={profile.linkedin} target="_blank" rel="noreferrer" className="nav__extlink">LinkedIn ↗</a>
+          <a href={profile.github} target="_blank" rel="noreferrer" className="nav__extlink">GitHub ↗</a>
+        </div>
+
+        <button
+          className="nav__toggle"
+          onClick={() => setIsOpen((v) => !v)}
+          aria-expanded={isOpen}
+          aria-label="Toggle navigation"
+        >
+          {isOpen ? 'Close' : 'Menu'}
+        </button>
       </div>
     </nav>
   );

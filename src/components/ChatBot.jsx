@@ -58,190 +58,66 @@ const ChatBot = () => {
 
   return (
     <>
-      {/* Launcher button */}
-      <button
-        onClick={() => setIsOpen((v) => !v)}
-        aria-label={isOpen ? 'Close chat' : `Open chat about ${profile.name}`}
-        className={isOpen ? '' : 'chat-launcher'}
-        style={{
-          position: 'fixed',
-          bottom: '24px',
-          right: '24px',
-          width: '60px',
-          height: '60px',
-          borderRadius: '50%',
-          border: 'none',
-          cursor: 'pointer',
-          zIndex: 200,
-          background: 'linear-gradient(135deg, var(--primary), var(--accent))',
-          color: '#fff',
-          fontSize: '1.6rem',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          boxShadow: '0 8px 24px rgba(167, 139, 250,0.4)',
-          transition: 'transform 0.2s ease',
-        }}
-        onMouseEnter={(e) => (e.currentTarget.style.transform = 'scale(1.08)')}
-        onMouseLeave={(e) => (e.currentTarget.style.transform = 'scale(1)')}
-      >
-        {isOpen ? '✕' : '💬'}
-      </button>
-
-      {/* Chat panel */}
-      {isOpen && (
-        <div
-          role="dialog"
-          aria-label={`Chat about ${profile.name}`}
-          className="glass-card"
-          style={{
-            position: 'fixed',
-            bottom: '96px',
-            right: '24px',
-            width: 'min(380px, calc(100vw - 32px))',
-            height: 'min(560px, calc(100vh - 140px))',
-            display: 'flex',
-            flexDirection: 'column',
-            zIndex: 200,
-            backgroundColor: 'var(--background)',
-            overflow: 'hidden',
-            padding: 0,
-          }}
+      {!isOpen && (
+        <button
+          className="chat-fab"
+          onClick={() => setIsOpen(true)}
+          aria-label={`Open chat about ${profile.name}`}
         >
-          {/* Header */}
-          <div
-            style={{
-              padding: '1rem 1.25rem',
-              background: 'linear-gradient(135deg, var(--primary), var(--accent))',
-              color: '#fff',
-            }}
-          >
-            <div style={{ fontWeight: 700, fontSize: '1.05rem' }}>Ask about {profile.name}</div>
-            <div style={{ fontSize: '0.8rem', opacity: 0.9 }}>
-              Instant answers, straight from her resume
-            </div>
+          <span className="dot dot--live" style={{ background: 'var(--signal)' }} />
+          Ask about me
+        </button>
+      )}
+
+      {isOpen && (
+        <div className="chat" role="dialog" aria-label={`Chat about ${profile.name}`}>
+          <div className="chat__bar">
+            <span className="panel__title">
+              <span className="dot dot--live" />
+              Résumé assistant
+            </span>
+            <button className="chat__close" onClick={() => setIsOpen(false)} aria-label="Close chat">
+              ✕
+            </button>
           </div>
 
-          {/* Messages */}
-          <div
-            ref={scrollRef}
-            style={{
-              flex: 1,
-              overflowY: 'auto',
-              padding: '1rem',
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '0.75rem',
-            }}
-          >
+          <div className="chat__log" ref={scrollRef}>
             {messages.map((m, i) => (
-              <div
-                key={i}
-                style={{
-                  alignSelf: m.role === 'user' ? 'flex-end' : 'flex-start',
-                  maxWidth: '85%',
-                  padding: '0.6rem 0.9rem',
-                  borderRadius: '1rem',
-                  borderBottomRightRadius: m.role === 'user' ? '0.25rem' : '1rem',
-                  borderBottomLeftRadius: m.role === 'assistant' ? '0.25rem' : '1rem',
-                  backgroundColor: m.role === 'user' ? 'var(--primary)' : 'var(--background-secondary)',
-                  color: m.role === 'user' ? '#fff' : 'var(--foreground)',
-                  fontSize: '0.92rem',
-                  lineHeight: 1.5,
-                  whiteSpace: 'pre-wrap',
-                }}
-              >
+              <div key={i} className={`msg msg--${m.role === 'user' ? 'u' : 'a'}`}>
                 {m.content}
               </div>
             ))}
 
             {isLoading && (
-              <div
-                style={{
-                  alignSelf: 'flex-start',
-                  padding: '0.6rem 0.9rem',
-                  borderRadius: '1rem',
-                  backgroundColor: 'var(--background-secondary)',
-                  color: 'var(--muted)',
-                  fontSize: '0.92rem',
-                }}
-              >
-                Thinking…
-              </div>
-            )}
-
-            {messages.length === 1 && !isLoading && (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginTop: '0.5rem' }}>
-                {STARTER_QUESTIONS.map((q) => (
-                  <button
-                    key={q}
-                    onClick={() => sendMessage(q)}
-                    style={{
-                      textAlign: 'left',
-                      padding: '0.55rem 0.85rem',
-                      borderRadius: '0.75rem',
-                      border: '1px solid var(--border)',
-                      backgroundColor: 'transparent',
-                      color: 'var(--primary)',
-                      fontSize: '0.85rem',
-                      cursor: 'pointer',
-                    }}
-                  >
-                    {q}
-                  </button>
-                ))}
+              <div className="msg msg--a">
+                <span className="typing"><span /><span /><span /></span>
               </div>
             )}
           </div>
 
-          {/* Input */}
-          <form
-            onSubmit={handleSubmit}
-            style={{
-              display: 'flex',
-              gap: '0.5rem',
-              padding: '0.75rem',
-              borderTop: '1px solid var(--border)',
-            }}
-          >
+          {messages.length === 1 && !isLoading && (
+            <div className="chat__starters">
+              {STARTER_QUESTIONS.map((q) => (
+                <button key={q} className="starter" onClick={() => sendMessage(q)}>
+                  {q}
+                </button>
+              ))}
+            </div>
+          )}
+
+          <form className="chat__form" onSubmit={handleSubmit}>
             <input
               ref={inputRef}
+              className="chat__input"
               value={input}
               onChange={(e) => setInput(e.target.value)}
               placeholder="Ask a question…"
               maxLength={1000}
               disabled={isLoading}
-              style={{
-                flex: 1,
-                padding: '0.6rem 0.9rem',
-                borderRadius: '9999px',
-                border: '1px solid var(--border)',
-                fontSize: '0.9rem',
-                outline: 'none',
-                backgroundColor: 'var(--background)',
-                color: 'var(--foreground)',
-              }}
+              aria-label="Your question"
             />
-            <button
-              type="submit"
-              disabled={isLoading || !input.trim()}
-              aria-label="Send message"
-              style={{
-                width: '42px',
-                height: '42px',
-                borderRadius: '50%',
-                border: 'none',
-                cursor: isLoading || !input.trim() ? 'default' : 'pointer',
-                backgroundColor: 'var(--primary)',
-                color: '#fff',
-                opacity: isLoading || !input.trim() ? 0.5 : 1,
-                fontSize: '1.1rem',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
-            >
-              →
+            <button type="submit" className="chat__send" disabled={isLoading || !input.trim()}>
+              Send
             </button>
           </form>
         </div>

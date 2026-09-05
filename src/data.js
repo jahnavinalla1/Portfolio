@@ -167,3 +167,67 @@ export const certifications = [
   "Fun fact: She can cook and code simultaneously.",
   "Superpower: Can shop for 10 hours straight without water or food.",
 ];
+
+// ---------------------------------------------------------------------------
+// Editorial content for the site. Everything here is drawn from the same
+// résumé material above, written out for reading rather than for scanning.
+// ---------------------------------------------------------------------------
+
+export const approach = [
+  {
+    title: "Make the contract the source of truth",
+    body: "An API that is documented after it ships is documented wrong. I write the OpenAPI spec first and enforce it with Joi schemas on the route, so a malformed request is rejected at the handler and client and server teams argue with the spec instead of with each other.",
+  },
+  {
+    title: "Design for the reading you cannot lose",
+    body: "Sensor data arrives whether or not the consumer is ready for it. Batching SQS consumption instead of pulling one message at a time is what keeps a compliance dashboard near-real-time when a facility streams faster than expected.",
+  },
+  {
+    title: "Test the paths that actually fail",
+    body: "Happy-path coverage tells you very little. The tests worth writing cover error branches and schema edge cases — and they belong in CI on every merge request, which is how four hours of manual pre-release API checking became thirty minutes.",
+  },
+  {
+    title: "Put guardrails in front of the model",
+    body: "Shipping an LLM feature is mostly the work that happens around the model: prompt constraints going in, response validation coming out, and a clear decision about what the system does when the model returns something it should not.",
+  },
+];
+
+export const operatingRange = [
+  {
+    title: "Frontend",
+    body: "React 19 and TypeScript with Redux state, built as reusable components and held to WCAG basics — keyboard paths, ARIA labels, contrast — before handoff, not after.",
+  },
+  {
+    title: "Backend & APIs",
+    body: "Node.js with Hapi and C#/.NET services behind contract-first REST, with validation, auth and error semantics decided at design time rather than patched in later.",
+  },
+  {
+    title: "Cloud & data",
+    body: "AWS event pipelines — Lambda, SQS, DynamoDB — alongside relational modelling in SQL Server and PostgreSQL, including the warehouse and audit-trail side of it.",
+  },
+  {
+    title: "AI systems",
+    body: "LLM features built with the OpenAI SDK and LangGraph: prompt design, multi-agent orchestration, and the validation layer that decides what reaches the user.",
+  },
+  {
+    title: "Quality",
+    body: "Jest, Vitest, Supertest and Postman suites wired into GitLab CI, plus the review habits that catch a problem while it is still cheap to fix.",
+  },
+];
+
+export const stats = [
+  { value: "4.00", label: "GPA, M.S. Information Technology, Arizona State" },
+  { value: "4h → 30m", label: "Manual pre-release API testing, after CI regression suites" },
+  { value: "40%", label: "MAPE improvement over a seasonal-naive forecasting baseline" },
+  { value: "80%", label: "Faster request submission on the React Native interface" },
+];
+
+export const about = {
+  location: "Dallas, Texas",
+  paragraphs: [
+    "I am a software development engineer working on a cleanroom monitoring platform used by an industrial environmental-monitoring client — the system that tells a regulated facility whether its differential pressure, temperature and humidity are still inside ISO limits.",
+    "That work sits across the whole stack: a React 19 and TypeScript front end, a Node.js and Hapi REST API, and an AWS ingestion pipeline moving sensor readings from facility hardware through Lambda and SQS into DynamoDB. It is a good teacher, because in a compliance product the failure mode is not a broken page — it is a gap in the record.",
+    "Before that I built REST services and mobile interfaces at GVR Info Systems, and finished an M.S. in Information Technology at Arizona State with a 4.00. Outside work I run, lift, read, and sing Carnatic music.",
+  ],
+  now: "Building the AI layer of the monitoring platform — in-product recommendations with the prompt guardrails and response validation that make model output safe to show a regulated customer.",
+};
