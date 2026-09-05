@@ -11,9 +11,10 @@ const Projects = () => {
           <p className="eyebrow">Selected builds</p>
           <h2 className="h2">Systems built end to end.</h2>
           <p className="body">
-            Five builds outside client work — forecasting, distributed services,
-            conversational AI and secure cloud architecture. Each one needed both
-            a data model and something a person could actually use.
+            Eight builds outside client work — forecasting, distributed
+            services, deep learning, conversational AI and secure cloud
+            architecture. Each one needed both a data model and something a
+            person could actually use.
           </p>
         </div>
 

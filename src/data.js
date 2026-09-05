@@ -166,7 +166,47 @@ export const projects = [
     ],
     tech: ["Microsoft SQL Server", "Data Warehousing", "T-SQL", "Stored Procedures", "Audit Logging"],
   },
+  {
+    name: "Deepfake Detection — Video Manipulation Classifier",
+    role: "Group project — team build",
+    problem: "Manipulated video is cheap to make and expensive to disprove, and a detector is only useful if it holds up on ordinary footage rather than on the curated clips it was tuned against.",
+    date: "",
+    status: "Completed",
+    bullets: [
+      "Built a two-stage detection pipeline: a ResNeXt CNN extracts spatial features from each frame, and an LSTM reads those features as a sequence to catch the temporal inconsistencies that manipulation leaves behind",
+      "Covered both face-replacement and reenactment manipulation rather than a single attack type",
+    ],
+    outcome: "Trained and evaluated against the FaceForensics++, DFDC and Celeb-DF datasets.",
+    tech: ["Python", "PyTorch", "ResNeXt CNN", "LSTM RNN"],
+  },
+  {
+    name: "ExtraTicket — Event Booking Platform",
+    role: "Group project — team build",
+    problem: "Group booking falls apart when seats are claimed one at a time: the block a group wants is gone before the group has finished deciding.",
+    date: "",
+    status: "Completed",
+    bullets: [
+      "Built an event booking platform with real-time seat selection and group reservations that hold adjacent seats together while a group decides",
+      "Added wallet integration and issued digital tickets on confirmed bookings",
+    ],
+    outcome: "Source available.",
+    tech: ["React Native", "Firebase", "Node.js"],
+  },
+  {
+    name: "Let's Get Cooking — Ingredient Recognition & Recipes",
+    role: "Group project — team build",
+    problem: "People decide meals from what is already in the kitchen, but recipe tools ask them to start from a finished dish and shop backwards.",
+    date: "",
+    status: "Completed",
+    bullets: [
+      "Built a recognition engine that identifies fruits and vegetables from an uploaded photo",
+      "Composed recipe suggestions from what the model actually detected rather than from a typed ingredient list",
+    ],
+    outcome: "Academic project.",
+    tech: ["Python", "Computer vision"],
+  },
 ];
+
 
 export const certifications = [
   "Ai fluency, Claude 101 – Anthropic Certifications",
