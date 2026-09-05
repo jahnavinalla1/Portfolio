@@ -100,7 +100,9 @@ export const education = [
 export const projects = [
   {
     name: "SCMA — Demand Forecasting & Supply-Chain Intelligence",
-    role: "Personal Project",
+    role: "Solo build — backend and modelling",
+    problem: "Factories commit inventory capital weeks before demand actually appears, and the seasonal rules of thumb they fall back on break down on irregular history.",
+    outcome: "40% MAPE improvement over a seasonal-naive baseline.",
     date: "August 2025 - December 2025",
     status: "Completed",
     bullets: [
@@ -111,7 +113,9 @@ export const projects = [
   },
   {
     name: "CHIRP — Full-Stack Social Media Platform",
-    role: "Personal Project",
+    role: "Solo build — full stack",
+    problem: "Service-to-service calls and browser-facing endpoints have different needs, and hand-written types on either side drift apart the moment one of them changes.",
+    outcome: "End-to-end type safety from generated contracts, with handlers covered by Vitest and Supertest in CI.",
     date: "December 2025",
     status: "Completed",
     bullets: [
@@ -123,7 +127,9 @@ export const projects = [
   },
   {
     name: "Medicare AI Chatbot",
-    role: "Internship Project",
+    role: "Internship project",
+    problem: "Medicare policy details, coverage rules and claims processes are spread across documents a person has to already know how to search before they can get an answer.",
+    outcome: "35% improvement in response accuracy, with a feedback loop feeding later iterations.",
     date: "",
     status: "Completed",
     bullets: [
@@ -134,7 +140,9 @@ export const projects = [
   },
   {
     name: "IT Asset Management System — IniTech Solutions",
-    role: "Capstone Project",
+    role: "Capstone project — architecture and security design",
+    problem: "Asset lifecycle tracking spread across teams leaves no single record of what exists, who holds it, or who is permitted to see it.",
+    outcome: "A cloud architecture, database schema and security plan meeting the regulatory requirements set for the brief.",
     date: "",
     status: "Completed",
     bullets: [
@@ -146,7 +154,9 @@ export const projects = [
   },
   {
     name: "Cybersecurity Incident Management System",
-    role: "Capstone Project",
+    role: "Capstone project — data modelling",
+    problem: "Incident records scattered across tools make it slow to answer what happened, when, and what changed — the questions an audit asks first.",
+    outcome: "Transparent audit trails and reliable incident data for faster security-team decisions.",
     date: "",
     status: "Completed",
     bullets: [
@@ -156,7 +166,47 @@ export const projects = [
     ],
     tech: ["Microsoft SQL Server", "Data Warehousing", "T-SQL", "Stored Procedures", "Audit Logging"],
   },
+  {
+    name: "Deepfake Detection — Video Manipulation Classifier",
+    role: "Group project — team build",
+    problem: "Manipulated video is cheap to make and expensive to disprove, and a detector is only useful if it holds up on ordinary footage rather than on the curated clips it was tuned against.",
+    date: "",
+    status: "Completed",
+    bullets: [
+      "Built a two-stage detection pipeline: a ResNeXt CNN extracts spatial features from each frame, and an LSTM reads those features as a sequence to catch the temporal inconsistencies that manipulation leaves behind",
+      "Covered both face-replacement and reenactment manipulation rather than a single attack type",
+    ],
+    outcome: "Trained and evaluated against the FaceForensics++, DFDC and Celeb-DF datasets.",
+    tech: ["Python", "PyTorch", "ResNeXt CNN", "LSTM RNN"],
+  },
+  {
+    name: "ExtraTicket — Event Booking Platform",
+    role: "Group project — team build",
+    problem: "Group booking falls apart when seats are claimed one at a time: the block a group wants is gone before the group has finished deciding.",
+    date: "",
+    status: "Completed",
+    bullets: [
+      "Built an event booking platform with real-time seat selection and group reservations that hold adjacent seats together while a group decides",
+      "Added wallet integration and issued digital tickets on confirmed bookings",
+    ],
+    outcome: "Source available.",
+    tech: ["React Native", "Firebase", "Node.js"],
+  },
+  {
+    name: "Let's Get Cooking — Ingredient Recognition & Recipes",
+    role: "Group project — team build",
+    problem: "People decide meals from what is already in the kitchen, but recipe tools ask them to start from a finished dish and shop backwards.",
+    date: "",
+    status: "Completed",
+    bullets: [
+      "Built a recognition engine that identifies fruits and vegetables from an uploaded photo",
+      "Composed recipe suggestions from what the model actually detected rather than from a typed ingredient list",
+    ],
+    outcome: "Academic project.",
+    tech: ["Python", "Computer vision"],
+  },
 ];
+
 
 export const certifications = [
   "Ai fluency, Claude 101 – Anthropic Certifications",

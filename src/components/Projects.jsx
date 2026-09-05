@@ -11,9 +11,10 @@ const Projects = () => {
           <p className="eyebrow">Selected builds</p>
           <h2 className="h2">Systems built end to end.</h2>
           <p className="body">
-            Five builds outside client work — forecasting, distributed services,
-            conversational AI and secure cloud architecture. Each one needed both
-            a data model and something a person could actually use.
+            Eight builds outside client work — forecasting, distributed
+            services, deep learning, conversational AI and secure cloud
+            architecture. Each one needed both a data model and something a
+            person could actually use.
           </p>
         </div>
 
@@ -27,7 +28,7 @@ const Projects = () => {
             <div className="build__grid">
               <div>
                 <div className="field">
-                  <p className="field__k">Context</p>
+                  <p className="field__k">Role</p>
                   <p className="field__v">{p.role}</p>
                 </div>
                 {p.date && (
@@ -38,19 +39,31 @@ const Projects = () => {
                 )}
               </div>
 
-              <div className="field">
-                <p className="field__k">What I built</p>
-                <div className="field__list">
-                  {p.bullets.map((b) => (
-                    <p className="field__v" key={b}>{b}</p>
-                  ))}
+              <div>
+                <div className="field">
+                  <p className="field__k">Problem</p>
+                  <p className="field__v">{p.problem}</p>
+                </div>
+                <div className="field">
+                  <p className="field__k">What I built</p>
+                  <div className="field__list">
+                    {p.bullets.map((b) => (
+                      <p className="field__v" key={b}>{b}</p>
+                    ))}
+                  </div>
                 </div>
               </div>
 
-              <div className="field field--tech">
-                <p className="field__k">Key technology</p>
-                <div className="tags" style={{ marginTop: 0 }}>
-                  {p.tech.map((t) => <span className="tag" key={t}>{t}</span>)}
+              <div className="field--tech">
+                <div className="field">
+                  <p className="field__k">Key technology</p>
+                  <div className="tags" style={{ marginTop: 0 }}>
+                    {p.tech.map((t) => <span className="tag" key={t}>{t}</span>)}
+                  </div>
+                </div>
+                <div className="field">
+                  <p className="field__k">Outcome</p>
+                  <p className="field__v">{p.outcome}</p>
                 </div>
               </div>
             </div>

@@ -152,13 +152,16 @@ const formatProject = (p, { full } = {}) =>
   `${p.name} — ${p.role}${p.date ? ` (${p.date})` : ''}. ${(full ? p.bullets : [p.bullets[0]]).join(' ')} Tech: ${p.tech.join(', ')}.`;
 
 // Keywords distinctive enough to identify a single project, so a question about
-// one specific project gets that project's full detail instead of all five at once.
+// one specific project gets that project's full detail instead of the whole list.
 const PROJECT_KEYWORDS = {
   'SCMA — Demand Forecasting & Supply-Chain Intelligence': ['scma'],
   'CHIRP — Full-Stack Social Media Platform': ['chirp'],
   'Medicare AI Chatbot': ['medicare'],
   'IT Asset Management System — IniTech Solutions': ['asset management', 'initech'],
   'Cybersecurity Incident Management System': ['incident management', 'cybersecurity'],
+  'Deepfake Detection — Video Manipulation Classifier': ['deepfake', 'deep fake', 'resnext', 'lstm'],
+  'ExtraTicket — Event Booking Platform': ['extraticket', 'extra ticket', 'booking', 'seat'],
+  "Let's Get Cooking — Ingredient Recognition & Recipes": ['cooking', 'recipe', 'ingredient'],
 };
 
 const projectsAnswer = (query = '') => {
@@ -252,7 +255,7 @@ const TOPICS = [
   },
   {
     id: 'projects',
-    keywords: ['project', 'projects', 'scma', 'chirp', 'medicare', 'asset management', 'incident management', 'initech', 'cybersecurity', 'capstone', 'startup'],
+    keywords: ['project', 'projects', 'scma', 'chirp', 'medicare', 'asset management', 'incident management', 'initech', 'cybersecurity', 'capstone', 'startup', 'deepfake', 'deep fake', 'extraticket', 'extra ticket', 'cooking', 'computer vision', 'pytorch', 'lstm'],
     answer: projectsAnswer,
   },
   {
