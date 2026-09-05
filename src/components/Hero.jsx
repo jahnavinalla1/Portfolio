@@ -1,181 +1,234 @@
+import { useMemo, useRef, useState } from 'react';
 import { profile } from '../data';
-import { useState, useEffect } from 'react';
+import { ROOMS, METRICS, buildSeries, breached } from '../telemetry';
 
-const Typewriter = ({ words }) => {
-  const [index, setIndex] = useState(0);
-  const [subIndex, setSubIndex] = useState(0);
-  const [blink, setBlink] = useState(true);
-  const [reverse, setReverse] = useState(false);
+const W = 600;
+const H = 186;
+const PAD = { top: 14, right: 10, bottom: 30, left: 10 };
 
-  // Blinking cursor
-  useEffect(() => {
-    const timeout2 = setTimeout(() => setBlink((prev) => !prev), 500);
-    return () => clearTimeout(timeout2);
-  }, [blink]);
+const TelemetryPanel = () => {
+  const [roomId, setRoomId] = useState(ROOMS[0].id);
+  const [metricId, setMetricId] = useState('dp');
+  const [excursion, setExcursion] = useState(false);
+  const [hover, setHover] = useState(null);
+  const svgRef = useRef(null);
 
-  // Typing logic
-  useEffect(() => {
-    if (index === words.length) {
-      setIndex(0);
-      return;
-    }
+  const room = ROOMS.find((r) => r.id === roomId);
+  const metric = METRICS.find((m) => m.id === metricId);
 
-    if (
-      subIndex === words[index].length + 1 && 
-      !reverse 
-    ) {
-      setTimeout(() => setReverse(true), 2000);
-      return;
-    }
+  const series = useMemo(
+    () => buildSeries(metric, room.seed, excursion),
+    [metric, room.seed, excursion]
+  );
 
-    if (subIndex === 0 && reverse) {
-      setReverse(false);
-      setIndex((prev) => prev + 1);
-      return;
-    }
+  const { path, area, points, min, max } = useMemo(() => {
+    const values = series.map((p) => p.value);
+    // Keep the spec floor in frame so a breach reads as crossing a line, not
+    // as the series simply running off the bottom of the chart.
+    const lo = Math.min(...values, metric.floor) - metric.swing;
+    const hi = Math.max(...values, metric.floor + metric.swing) + metric.swing;
+    const innerW = W - PAD.left - PAD.right;
+    const innerH = H - PAD.top - PAD.bottom;
 
-    const timeout = setTimeout(() => {
-      setSubIndex((prev) => prev + (reverse ? -1 : 1));
-    }, Math.max(reverse ? 50 : 100, parseInt(Math.random() * 100)));
+    const pts = series.map((p, i) => ({
+      ...p,
+      x: PAD.left + (i / (series.length - 1)) * innerW,
+      y: PAD.top + (1 - (p.value - lo) / (hi - lo)) * innerH,
+    }));
 
-    return () => clearTimeout(timeout);
-  }, [subIndex, index, reverse, words]);
+    const d = pts.map((p, i) => `${i === 0 ? 'M' : 'L'}${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' ');
+    const baseline = PAD.top + innerH;
+    return {
+      path: d,
+      area: `${d} L${pts[pts.length - 1].x.toFixed(1)},${baseline} L${pts[0].x.toFixed(1)},${baseline} Z`,
+      points: pts,
+      min: lo,
+      max: hi,
+    };
+  }, [series, metric]);
+
+  const floorY =
+    PAD.top + (1 - (metric.floor - min) / (max - min)) * (H - PAD.top - PAD.bottom);
+
+  const isBreached = breached(series, metric);
+  const latest = series[series.length - 1];
+  const active = hover !== null ? points[hover] : points[points.length - 1];
+
+  const onMove = (e) => {
+    const rect = svgRef.current.getBoundingClientRect();
+    const rel = ((e.clientX - rect.left) / rect.width) * W;
+    const innerW = W - PAD.left - PAD.right;
+    const idx = Math.round(((rel - PAD.left) / innerW) * (points.length - 1));
+    setHover(Math.max(0, Math.min(points.length - 1, idx)));
+  };
+
+  const fmt = (v) => v.toFixed(metric.decimals);
 
   return (
-    <>
-      {words[index]?.substring(0, subIndex)}
-      <span style={{ opacity: blink ? 1 : 0, transition: 'opacity 0.1s' }}>|</span>
-    </>
+    <div className="panel">
+      <div className="panel__bar">
+        <span className="panel__title">
+          <span className={"dot dot--live"} style={isBreached ? { background: 'var(--bad)' } : undefined} />
+          Cleanroom // Live Telemetry
+        </span>
+        <select
+          className="panel__select"
+          value={roomId}
+          onChange={(e) => { setRoomId(e.target.value); setHover(null); }}
+          aria-label="Select monitored room"
+        >
+          {ROOMS.map((r) => (
+            <option key={r.id} value={r.id}>{r.label}</option>
+          ))}
+        </select>
+      </div>
+
+      <div className="panel__chart">
+        <svg
+          ref={svgRef}
+          viewBox={`0 0 ${W} ${H}`}
+          role="img"
+          aria-label={`${metric.name} for ${room.label} over the last 24 hours`}
+          onMouseMove={onMove}
+          onMouseLeave={() => setHover(null)}
+        >
+          <defs>
+            <linearGradient id="fill" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="var(--signal)" stopOpacity="0.22" />
+              <stop offset="100%" stopColor="var(--signal)" stopOpacity="0" />
+            </linearGradient>
+          </defs>
+
+          {/* horizontal guides */}
+          {[0, 0.5, 1].map((t) => {
+            const y = PAD.top + t * (H - PAD.top - PAD.bottom);
+            return <line key={t} x1={PAD.left} y1={y} x2={W - PAD.right} y2={y} stroke="var(--line)" strokeWidth="1" />;
+          })}
+
+          {/* ISO specification floor */}
+          <line
+            x1={PAD.left} y1={floorY} x2={W - PAD.right} y2={floorY}
+            stroke={isBreached ? 'var(--bad)' : 'var(--line-strong)'}
+            strokeWidth="1"
+            strokeDasharray="3 4"
+          />
+          <text x={W - PAD.right} y={floorY - 5} textAnchor="end" className="axis-label" style={{ fill: isBreached ? 'var(--bad)' : 'var(--text-3)' }}>
+            ISO limit {fmt(metric.floor)}{metric.unit}
+          </text>
+
+          <path d={area} fill="url(#fill)" />
+          <path d={path} fill="none" stroke="var(--signal)" strokeWidth="1.6" strokeLinejoin="round" strokeLinecap="round" />
+
+          {hover !== null && (
+            <line x1={active.x} y1={PAD.top} x2={active.x} y2={H - PAD.bottom} stroke="var(--line-strong)" strokeWidth="1" />
+          )}
+          <circle cx={active.x} cy={active.y} r="3" fill="var(--bg)" stroke="var(--signal)" strokeWidth="1.6" />
+
+          {/* time axis */}
+          {[0, 12, 24, 36, 47].map((i) => (
+            <text key={i} x={points[i].x} y={H - 10} textAnchor="middle" className="axis-label">
+              {points[i].label}
+            </text>
+          ))}
+        </svg>
+
+        {hover !== null && (
+          <div className="tip" style={{ left: `${(active.x / W) * 100}%`, top: `${(active.y / H) * 100}%` }}>
+            <div className="tip__v">{fmt(active.value)}<span style={{ fontSize: '0.7em', marginLeft: 2 }}>{metric.unit}</span></div>
+            <div className="tip__u">{active.label} · {metric.label}</div>
+          </div>
+        )}
+      </div>
+
+      <div className="panel__controls">
+        <div className="seg">
+          <span className="seg__label">Metric:</span>
+          <div className="seg__btns">
+            {METRICS.map((m) => (
+              <button
+                key={m.id}
+                className={`seg__btn${m.id === metricId ? ' seg__btn--on' : ''}`}
+                onClick={() => { setMetricId(m.id); setHover(null); }}
+                aria-pressed={m.id === metricId}
+              >
+                {m.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <button
+          className={`switch${excursion ? ' switch--on' : ''}`}
+          onClick={() => setExcursion((v) => !v)}
+          aria-pressed={excursion}
+        >
+          <span className="switch__track"><span className="switch__thumb" /></span>
+          <span className="seg__label">Simulate door excursion</span>
+        </button>
+      </div>
+
+      <dl className="panel__stats">
+        <div className="panel__stat">
+          <dt>Current</dt>
+          <dd>{fmt(latest.value)} {metric.unit}</dd>
+        </div>
+        <div className="panel__stat">
+          <dt>ISO state</dt>
+          <dd style={{ color: isBreached ? 'var(--bad)' : 'var(--ok)' }}>
+            {isBreached ? 'Excursion' : 'In spec'}
+          </dd>
+        </div>
+        <div className="panel__stat">
+          <dt>Ingest</dt>
+          <dd>Lambda → SQS</dd>
+        </div>
+        <div className="panel__stat">
+          <dt>Readings</dt>
+          <dd>48 / 24h</dd>
+        </div>
+      </dl>
+    </div>
   );
 };
 
-const Hero = () => {
-  return (
-    <section style={{
-      minHeight: '85vh',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      position: 'relative',
-      overflow: 'hidden',
-      background: 'linear-gradient(to bottom, var(--background), var(--background-secondary))'
-    }}>
-      {/* Background Floating Images */}
-      <div style={{ position: 'absolute', inset: 0, overflow: 'hidden', zIndex: 0, pointerEvents: 'none' }}>
-        {/* Glowing Orbs */}
-        <div style={{ position: 'absolute', top: '-10%', left: '-10%', width: '400px', height: '400px', borderRadius: '50%', background: 'rgba(236, 72, 153, 0.2)', filter: 'blur(100px)' }}></div>
-        <div style={{ position: 'absolute', bottom: '-20%', right: '-10%', width: '500px', height: '500px', borderRadius: '50%', background: 'rgba(6, 182, 212, 0.2)', filter: 'blur(120px)' }} className="animate-float-delayed"></div>
-        <div style={{ position: 'absolute', top: '40%', left: '40%', width: '300px', height: '300px', borderRadius: '50%', background: 'rgba(250, 204, 21, 0.2)', filter: 'blur(100px)' }} className="animate-float-doodle"></div>
-        
-        {/* Tech/Code */}
-        <img 
-          src="https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=400&q=80" 
-          alt="Tech" 
-          className="animate-float" 
-          style={{ position: 'absolute', top: '10%', left: '5%', width: '180px', height: '180px', objectFit: 'cover', borderRadius: '1rem', opacity: 1, transform: 'rotate(-10deg)', boxShadow: '0 10px 30px rgba(0,0,0,0.1)' }} 
-        />
-        {/* ASU Campus / University */}
-        <img 
-          src="https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&w=400&q=80" 
-          alt="Campus" 
-          className="animate-float-delayed" 
-          style={{ position: 'absolute', top: '20%', right: '8%', width: '220px', height: '150px', objectFit: 'cover', borderRadius: '1rem', opacity: 1, transform: 'rotate(5deg)', boxShadow: '0 10px 30px rgba(0,0,0,0.1)' }} 
-        />
-        {/* Singer / Carnatic Music */}
-        <img 
-          src="https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&w=400&q=80" 
-          alt="Singer" 
-          className="animate-float-doodle" 
-          style={{ position: 'absolute', bottom: '10%', left: '15%', width: '160px', height: '160px', objectFit: 'cover', borderRadius: '50%', opacity: 1, boxShadow: '0 10px 30px rgba(0,0,0,0.1)' }} 
-        />
-        {/* Athlete / Running */}
-        <img 
-          src="https://images.unsplash.com/photo-1571008887538-b36bb32f4571?auto=format&fit=crop&w=400&q=80" 
-          alt="Athlete" 
-          className="animate-float" 
-          style={{ position: 'absolute', bottom: '15%', right: '15%', width: '200px', height: '200px', objectFit: 'cover', borderRadius: '1rem', opacity: 1, transform: 'rotate(-5deg)', boxShadow: '0 10px 30px rgba(0,0,0,0.1)' }} 
-        />
-        {/* AI / Cloud */}
-        <img 
-          src="https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=400&q=80" 
-          alt="AI Cloud" 
-          className="animate-float-delayed" 
-          style={{ position: 'absolute', top: '5%', left: '40%', width: '150px', height: '150px', objectFit: 'cover', borderRadius: '1rem', opacity: 1, transform: 'rotate(15deg)', boxShadow: '0 10px 30px rgba(0,0,0,0.1)' }} 
-        />
-        {/* Workspace */}
-        <img 
-          src="https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=400&q=80" 
-          alt="Workspace" 
-          className="animate-float-doodle" 
-          style={{ position: 'absolute', top: '50%', left: '2%', width: '140px', height: '140px', objectFit: 'cover', borderRadius: '1rem', opacity: 1, transform: 'rotate(-15deg)', boxShadow: '0 10px 30px rgba(0,0,0,0.1)' }} 
-        />
-        {/* Data Analytics */}
-        <img 
-          src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=400&q=80" 
-          alt="Data" 
-          className="animate-float" 
-          style={{ position: 'absolute', top: '55%', right: '3%', width: '170px', height: '170px', objectFit: 'cover', borderRadius: '50%', opacity: 1, transform: 'rotate(10deg)', boxShadow: '0 10px 30px rgba(0,0,0,0.1)' }} 
-        />
-        {/* Books / Learning */}
-        <img 
-          src="https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?auto=format&fit=crop&w=400&q=80" 
-          alt="Books" 
-          className="animate-float-delayed" 
-          style={{ position: 'absolute', bottom: '5%', left: '45%', width: '160px', height: '120px', objectFit: 'cover', borderRadius: '1rem', opacity: 1, transform: 'rotate(-8deg)', boxShadow: '0 10px 30px rgba(0,0,0,0.1)' }} 
-        />
-
-        <div className="bg-grid-pattern" style={{ position: 'absolute', inset: 0, opacity: 0.2 }}></div>
-      </div>
-
-      {/* Content */}
-      <div className="glass-card" style={{ position: 'relative', zIndex: 10, textAlign: 'center', padding: '4rem 2rem', maxWidth: '1000px', backgroundColor: 'rgba(10,14,20,0.75)', backdropFilter: 'blur(16px)', border: '1px solid var(--border)', margin: '0 20px' }}>
-        <h1 className="gradient-text" style={{ fontSize: '5.5rem', fontWeight: 800, marginBottom: '1.5rem', lineHeight: 1.1 }}>
-          {profile.name}
-        </h1>
-        <p style={{ fontSize: '2rem', fontWeight: 600, marginBottom: '2rem', color: 'var(--primary)', height: '40px' }}>
-          <Typewriter words={[profile.role, "AI Platform Architect", "Full-Stack Specialist"]} />
+const Hero = () => (
+  <header className="hero" id="top">
+    <div className="wrap hero__grid">
+      <div>
+        <p className="hero__name">{profile.name}</p>
+        <h1 className="h1 hero__title">Software Engineer.</h1>
+        <p className="hero__sub">I build systems that have to stay right when nobody is watching.</p>
+        <p className="hero__blurb">
+          Telemetry pipelines, contract-first APIs and AI features for a compliance
+          platform where a missed reading is an audit finding, not a bug ticket.
         </p>
-        <p style={{ fontSize: '1.4rem', lineHeight: 1.6, color: 'var(--muted)', marginBottom: '3.5rem' }}>
-          {profile.summary}
-        </p>
-        <div style={{ display: 'flex', gap: '1.25rem', justifyContent: 'center', flexWrap: 'wrap' }}>
-          <a href="#experience" className="gradient-button" style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            padding: '1.25rem 2.5rem',
-            borderRadius: '9999px',
-            fontWeight: 700,
-            fontSize: '1.2rem',
-            transition: 'all 0.3s ease'
-          }}>
-            Explore My Work
-            <span style={{ marginLeft: '10px' }}>→</span>
+
+        <div className="hero__cta">
+          <a href="#work" className="btn btn--primary">
+            See the work <span className="btn__arrow">→</span>
           </a>
-          <button
-            onClick={() => window.dispatchEvent(new CustomEvent('open-chat'))}
-            className="pulse-cta"
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              padding: '1.25rem 2.5rem',
-              borderRadius: '9999px',
-              fontWeight: 700,
-              fontSize: '1.2rem',
-              border: 'none',
-              cursor: 'pointer',
-              color: '#fff',
-              background: 'linear-gradient(135deg, var(--primary), var(--accent))',
-              transition: 'transform 0.3s ease'
-            }}
-            onMouseEnter={(e) => (e.currentTarget.style.transform = 'scale(1.03)')}
-            onMouseLeave={(e) => (e.currentTarget.style.transform = 'scale(1)')}
-          >
-            💬 Ask Me Anything
+          <button className="btn" onClick={() => window.dispatchEvent(new CustomEvent('open-chat'))}>
+            Ask about my background
           </button>
         </div>
+
+        <div className="hero__social">
+          <a href={profile.linkedin} target="_blank" rel="noreferrer" className="link-mono">LinkedIn ↗</a>
+          <a href={profile.github} target="_blank" rel="noreferrer" className="link-mono">GitHub ↗</a>
+          <a href={`mailto:${profile.email}`} className="link-mono">Email ↗</a>
+          <a href="/resume.pdf" download="Jahnavi_Nalla_Resume.pdf" className="link-mono">Résumé ↓</a>
+        </div>
       </div>
-    </section>
-  );
-};
+
+      <div>
+        <TelemetryPanel />
+        <p className="hero__caption">
+          Live interactive panel · hover to inspect a reading, switch metric or
+          simulate an out-of-spec excursion
+        </p>
+      </div>
+    </div>
+  </header>
+);
 
 export default Hero;
