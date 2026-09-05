@@ -100,7 +100,9 @@ export const education = [
 export const projects = [
   {
     name: "SCMA — Demand Forecasting & Supply-Chain Intelligence",
-    role: "Personal Project",
+    role: "Solo build — backend and modelling",
+    problem: "Factories commit inventory capital weeks before demand actually appears, and the seasonal rules of thumb they fall back on break down on irregular history.",
+    outcome: "40% MAPE improvement over a seasonal-naive baseline.",
     date: "August 2025 - December 2025",
     status: "Completed",
     bullets: [
@@ -111,7 +113,9 @@ export const projects = [
   },
   {
     name: "CHIRP — Full-Stack Social Media Platform",
-    role: "Personal Project",
+    role: "Solo build — full stack",
+    problem: "Service-to-service calls and browser-facing endpoints have different needs, and hand-written types on either side drift apart the moment one of them changes.",
+    outcome: "End-to-end type safety from generated contracts, with handlers covered by Vitest and Supertest in CI.",
     date: "December 2025",
     status: "Completed",
     bullets: [
@@ -123,7 +127,9 @@ export const projects = [
   },
   {
     name: "Medicare AI Chatbot",
-    role: "Internship Project",
+    role: "Internship project",
+    problem: "Medicare policy details, coverage rules and claims processes are spread across documents a person has to already know how to search before they can get an answer.",
+    outcome: "35% improvement in response accuracy, with a feedback loop feeding later iterations.",
     date: "",
     status: "Completed",
     bullets: [
@@ -134,7 +140,9 @@ export const projects = [
   },
   {
     name: "IT Asset Management System — IniTech Solutions",
-    role: "Capstone Project",
+    role: "Capstone project — architecture and security design",
+    problem: "Asset lifecycle tracking spread across teams leaves no single record of what exists, who holds it, or who is permitted to see it.",
+    outcome: "A cloud architecture, database schema and security plan meeting the regulatory requirements set for the brief.",
     date: "",
     status: "Completed",
     bullets: [
@@ -146,7 +154,9 @@ export const projects = [
   },
   {
     name: "Cybersecurity Incident Management System",
-    role: "Capstone Project",
+    role: "Capstone project — data modelling",
+    problem: "Incident records scattered across tools make it slow to answer what happened, when, and what changed — the questions an audit asks first.",
+    outcome: "Transparent audit trails and reliable incident data for faster security-team decisions.",
     date: "",
     status: "Completed",
     bullets: [
