@@ -1,22 +1,25 @@
 # Portfolio
 
-## Chat widget
+## Gemini-powered chat widget
 
 The site has a floating chat widget ([src/components/ChatBot.jsx](src/components/ChatBot.jsx))
-that answers visitor questions about the resume content. It runs entirely in the
-browser — a local keyword-matching engine in
-[src/chatKnowledge.js](src/chatKnowledge.js) matches the question against topics
-(AWS/cloud, frontend, backend, AI/ML, experience, projects, education, contact,
-availability, etc.) and assembles an answer from real resume data. No API, no key,
-no server, no cost.
+that answers visitor questions about the resume content. In production it calls
+Gemini through the serverless endpoint in [api/chat.js](api/chat.js). The API key
+stays on the server and is never included in the browser bundle.
 
-Its knowledge comes entirely from [src/data.js](src/data.js) — the same data the
-rest of the site renders — plus a few recruiter-facing extras (location, open-to,
-relocation, availability, work authorization) at the top of `chatKnowledge.js`.
-Edit either file and the bot's answers update automatically. Compensation questions
-are always deflected to your email rather than answered, by design.
+Its knowledge comes from [src/data.js](src/data.js) — the same data the rest of the
+site renders — plus recruiter-facing facts at the top of `chatKnowledge.js`. The
+server limits input, output, and conversation history to conserve free-tier quota.
+If Gemini is unavailable or the site is running as a static preview, the existing
+local keyword matcher answers instead.
 
-Works out of the box with `npm run dev` — nothing else to configure.
+Create a Gemini key in Google AI Studio, then add it to the Vercel project's
+environment variables as `GEMINI_API_KEY`. Redeploy after saving it. The optional
+`GEMINI_MODEL` variable can override the default `gemini-3.8-flash` model.
+
+For local end-to-end testing, put the same variable in `.env.local` and use
+`vercel dev`; plain `npm run dev` exercises the local fallback because Vite does not
+run the serverless endpoint.
 
 ---
 

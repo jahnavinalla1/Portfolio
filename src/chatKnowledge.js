@@ -149,7 +149,7 @@ const experienceAnswer = (query = '') => {
 };
 
 const formatProject = (p, { full } = {}) =>
-  `${p.name} — ${p.role}${p.date ? ` (${p.date})` : ''}. ${(full ? p.bullets : [p.bullets[0]]).join(' ')} Tech: ${p.tech.join(', ')}.`;
+  `${p.name} — ${p.role}${p.date ? ` (${p.date})` : ''}. ${(full ? p.bullets : [p.bullets[0]]).join(' ')} Outcome: ${p.outcome} Tech: ${p.tech.join(', ')}.${p.source ? ` Source: ${p.source}` : ''}`;
 
 // Keywords distinctive enough to identify a single project, so a question about
 // one specific project gets that project's full detail instead of the whole list.
@@ -162,6 +162,7 @@ const PROJECT_KEYWORDS = {
   'Deepfake Detection — Video Manipulation Classifier': ['deepfake', 'deep fake', 'resnext', 'lstm'],
   'ExtraTicket — Event Booking Platform': ['extraticket', 'extra ticket', 'booking', 'seat'],
   "Let's Get Cooking — Ingredient Recognition & Recipes": ['cooking', 'recipe', 'ingredient'],
+  'Tandem — Safe Browser Automation for Financial Systems': ['tandem', 'browser automation', 'playwright', 'financial automation'],
 };
 
 const projectsAnswer = (query = '') => {
@@ -255,7 +256,7 @@ const TOPICS = [
   },
   {
     id: 'projects',
-    keywords: ['project', 'projects', 'scma', 'chirp', 'medicare', 'asset management', 'incident management', 'initech', 'cybersecurity', 'capstone', 'startup', 'deepfake', 'deep fake', 'extraticket', 'extra ticket', 'cooking', 'computer vision', 'pytorch', 'lstm'],
+    keywords: ['project', 'projects', 'scma', 'chirp', 'medicare', 'asset management', 'incident management', 'initech', 'cybersecurity', 'capstone', 'startup', 'deepfake', 'deep fake', 'extraticket', 'extra ticket', 'cooking', 'computer vision', 'pytorch', 'lstm', 'tandem', 'browser automation', 'playwright'],
     answer: projectsAnswer,
   },
   {

@@ -33,22 +33,40 @@ const ChatBot = () => {
     return () => window.removeEventListener('open-chat', openHandler);
   }, []);
 
-  const sendMessage = (text) => {
+  const sendMessage = async (text) => {
     const trimmed = text.trim();
     if (!trimmed || isLoading) return;
+
+    const history = messages
+      .slice(1)
+      .slice(-6)
+      .map(({ role, content }) => ({ role, content }));
 
     setMessages((prev) => [...prev, { role: 'user', content: trimmed }]);
     setInput('');
     setIsLoading(true);
 
-    // Small artificial delay so the reply doesn't feel instant/robotic, even
-    // though it's just a local lookup with no network call involved.
-    const delay = 300 + Math.random() * 300;
-    setTimeout(() => {
+    try {
+      const response = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ question: trimmed, history }),
+      });
+
+      if (!response.ok) throw new Error('Gemini unavailable');
+
+      const data = await response.json();
+      if (!data.answer) throw new Error('Empty Gemini answer');
+
+      setMessages((prev) => [...prev, { role: 'assistant', content: data.answer }]);
+    } catch {
+      // Static/local previews do not have the serverless route. The original
+      // resume matcher also keeps the widget useful if free-tier quota is hit.
       const reply = answerQuestion(trimmed);
       setMessages((prev) => [...prev, { role: 'assistant', content: reply }]);
+    } finally {
       setIsLoading(false);
-    }, delay);
+    }
   };
 
   const handleSubmit = (e) => {
