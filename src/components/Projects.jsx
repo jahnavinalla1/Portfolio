@@ -11,10 +11,10 @@ const Projects = () => {
           <p className="eyebrow">Selected builds</p>
           <h2 className="h2">Systems built end to end.</h2>
           <p className="body">
-            Eight builds outside client work — forecasting, distributed
-            services, deep learning, conversational AI and secure cloud
-            architecture. Each one needed both a data model and something a
-            person could actually use.
+            Nine builds outside client work — forecasting, distributed
+            services, deep learning, conversational AI, safe browser automation
+            and secure cloud architecture. Each one needed both a data model
+            and something a person could actually use.
           </p>
         </div>
 
@@ -22,7 +22,14 @@ const Projects = () => {
           <article className="build" key={p.name}>
             <div className="build__head">
               <h3 className="h3 build__title">{p.name}</h3>
-              <span className="num">{String(i + 1).padStart(2, '0')}</span>
+              <div className="build__meta">
+                {p.source && (
+                  <a href={p.source} target="_blank" rel="noreferrer" className="link-mono">
+                    Source ↗
+                  </a>
+                )}
+                <span className="num">{String(i + 1).padStart(2, '0')}</span>
+              </div>
             </div>
 
             <div className="build__grid">

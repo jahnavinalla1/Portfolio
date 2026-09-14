@@ -205,6 +205,21 @@ export const projects = [
     outcome: "Academic project.",
     tech: ["Python", "Computer vision"],
   },
+  {
+    name: "Tandem — Safe Browser Automation for Financial Systems",
+    role: "Independent engineering project — architecture and implementation",
+    problem: "Legacy banking workflows span disconnected browser-based systems, so a timeout after money moves can leave automation unsure whether it is safe to retry or whether the action already succeeded.",
+    date: "",
+    status: "Completed",
+    bullets: [
+      "Built a discovery-to-replay system that uses an LLM to explore a workflow once, compiles the successful trace into a versioned capability, and replays it deterministically through Playwright with zero model calls",
+      "Implemented effect-aware safeguards for monetary actions, including idempotency checks, member and amount validation, post-action reconciliation, an append-only SQLite WAL ledger, and single-owner human handoff",
+      "Created simulated core-banking, card-processor, and notice systems plus an operator console and automated unit, integration, end-to-end, regression, and adversarial audit coverage",
+    ],
+    outcome: "Verified safe completion, duplicate prevention, policy denial, uncertain-effect reconciliation, and human handoff across the repository's demonstration scenarios.",
+    tech: ["Python 3.12", "FastAPI", "Playwright", "SQLite WAL", "Pydantic", "Gemini", "Docker"],
+    source: "https://github.com/jahnavinalla1/Tandem-Interface.ai",
+  },
 ];
 
 
